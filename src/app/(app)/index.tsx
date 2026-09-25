@@ -1,3 +1,4 @@
+import { router, type Href } from 'expo-router';
 import { Moon, Sun } from 'lucide-react-native';
 import { MotiView } from 'moti';
 import { useState } from 'react';
@@ -61,6 +62,13 @@ export default function DashboardScreen() {
             Theme {preference === 'dark' ? 'Dark' : 'Light'}
           </Text>
         </View>
+
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/notes' as Href)}
+          className="rounded-3xl bg-sky-600 px-5 py-4">
+          <Text className="text-base font-semibold text-white">Open notes</Text>
+        </Pressable>
 
         {error ? <Text className="text-sm text-rose-600 dark:text-rose-400">{error}</Text> : null}
         <SubmitButton label="Sign out" loading={loading} onPress={onSignOut} />

@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { cssInterop } from 'nativewind';
 import { MotiView } from 'moti';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AuthProvider, useAuth } from '@/providers/auth-provider';
 import { ThemeProvider, useThemePreference } from '@/providers/theme-provider';
@@ -16,12 +17,14 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <SplashGate />
-        <RootNavigator />
-      </AuthProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <AuthProvider>
+          <SplashGate />
+          <RootNavigator />
+        </AuthProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
 
