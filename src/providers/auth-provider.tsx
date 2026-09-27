@@ -25,6 +25,9 @@ type AuthContextValue = {
     confirmPassword: string,
   ) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signOut: () => Promise<{ error: string | null }>;
+  recoveryInProgress: boolean;
+  beginRecovery: () => void;
+  endRecovery: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -44,6 +47,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [isReady, setIsReady] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [lockout, setLockout] = useState<LockoutState>({ failures: 0, lockedUntil: 0 });
+  const [recoveryInProgress, setRecoveryInProgress] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -112,6 +116,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     const cleared = await clearLockout();
     setLockout(cleared);
+    setRecoveryInProgress(false);
     return { error: null };
   }, [lockout]);
 
@@ -147,6 +152,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return { error: null, needsConfirmation: !data.session };
   }, []);
 
+  const beginRecovery = useCallback(() => {
+    setRecoveryInProgress(true);
+  }, []);
+
+  const endRecovery = useCallback(() => {
+    setRecoveryInProgress(false);
+  }, []);
+
   const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut();
     if (error) return { error: authMessage(error) };
@@ -165,8 +178,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
       signIn,
       signUp,
       signOut,
+      recoveryInProgress,
+      beginRecovery,
+      endRecovery,
     }),
-    [isReady, lockout, now, session, signIn, signOut, signUp],
+    [beginRecovery, endRecovery, isReady, lockout, now, recoveryInProgress, session, signIn, signOut, signUp],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

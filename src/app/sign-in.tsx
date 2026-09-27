@@ -1,7 +1,7 @@
-import { Link } from 'expo-router';
+import { Link, router, type Href } from 'expo-router';
 import { MotiView } from 'moti';
 import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SecureField } from '@/components/auth/secure-field';
@@ -10,7 +10,7 @@ import { fieldErrors, sanitizeEmail, sanitizePassword, signInSchema } from '@/li
 import { useAuth } from '@/providers/auth-provider';
 
 export default function SignInScreen() {
-  const { signIn, lockoutRemainingMs, isConfigured } = useAuth();
+  const { signIn, lockoutRemainingMs, isConfigured, beginRecovery } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -101,6 +101,15 @@ export default function SignInScreen() {
             ) : null}
 
             <SubmitButton label="Sign in" loading={loading} disabled={locked} onPress={onSubmit} />
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => {
+                beginRecovery();
+                router.push('/reset-password' as Href);
+              }}
+              className="items-center py-1">
+              <Text className="text-sm font-medium text-slate-600 dark:text-slate-300">Forgot password?</Text>
+            </Pressable>
             <Link href="/sign-up" className="text-center text-sm font-medium text-sky-700 dark:text-sky-300">
               Need an account? Create one
             </Link>

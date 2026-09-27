@@ -42,6 +42,24 @@ const strongPasswordSchema = z
   .refine((value) => /\d/.test(value), 'Include a number.')
   .refine((value) => /[^A-Za-z0-9]/.test(value), 'Include a symbol.');
 
+export const recoveryEmailSchema = z.object({
+  email: emailSchema,
+});
+
+export const recoveryCodeSchema = z
+  .string()
+  .regex(/^\d{6}$/, 'Enter the 6-digit code from your email.');
+
+export const newPasswordSchema = z
+  .object({
+    password: strongPasswordSchema,
+    confirmPassword: z.string().min(1, 'Confirm your new password.'),
+  })
+  .refine((value) => value.password === value.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords do not match.',
+  });
+
 export const signInSchema = z.object({
   email: emailSchema,
   password: z
